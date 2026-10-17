@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -130,12 +131,20 @@ fun ScreenHome(
                    )
                }
 
-            ProductGrid(
-                products = state.data,
-                onProductClick = {
-                      println("Clicked on product: $it")
-                }
-            )
+               Box(
+                   modifier = Modifier
+                       .fillMaxWidth()
+                       .fillMaxHeight()
+                       .height(1950.dp)
+
+               ) {
+                   ProductGrid(
+                       products = state.data,
+                       onProductClick = {
+                           println("Clicked on product: $it")
+                       }
+                   )
+               }
 
 
            }

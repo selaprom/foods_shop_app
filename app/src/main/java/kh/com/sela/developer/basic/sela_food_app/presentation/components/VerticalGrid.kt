@@ -2,8 +2,6 @@ package kh.com.sela.developer.basic.sela_food_app.presentation.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,27 +23,25 @@ import kh.com.sela.developer.basic.sela_food_app.data.response.ApiResponse
 import kh.com.sela.developer.basic.sela_food_app.data.response.ProductDto
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 
-@OptIn(ExperimentalLayoutApi::class)
+
 @Composable
 fun ProductGrid(
     products: ApiResponse<List<ProductDto>>,
     onProductClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    FlowRow(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        maxItemsInEachRow = 2,
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        userScrollEnabled = false,
+        contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = modifier.fillMaxSize()
     ) {
-        products.data.forEach { product ->
+        items(products.data, key = { it.id }) { product ->
             Card(
                 onClick = { onProductClick(product.id) },
-                modifier = Modifier
-                    .weight(1f),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(16.dp),
             ) {
                 AsyncImage(
                     model = product.imageUrl,
@@ -55,18 +51,9 @@ fun ProductGrid(
                         .fillMaxWidth()
                         .aspectRatio(1f)
                 )
-
                 Column(Modifier.padding(8.dp)) {
-                    Text(
-                        text = product.name,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-
-                    Text(
-                        text = "$${product.price}",
-                        color = OldGreen
-                    )
+                    Text(product.name, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text("$${product.price}", color = OldGreen)
                 }
             }
         }
