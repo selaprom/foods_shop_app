@@ -9,11 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import kh.com.sela.developer.basic.sela_food_app.navigation.MainScreenRoute
-import kh.com.sela.developer.basic.sela_food_app.screens.cart_screen.ScreenCart
-import kh.com.sela.developer.basic.sela_food_app.screens.main_screen.MainScreen
+import kh.com.sela.developer.basic.sela_food_app.presentation.cart_screen.ScreenCart
+import kh.com.sela.developer.basic.sela_food_app.presentation.main_screen.MainScreen
 
 @Composable
 fun AppNavigation() {

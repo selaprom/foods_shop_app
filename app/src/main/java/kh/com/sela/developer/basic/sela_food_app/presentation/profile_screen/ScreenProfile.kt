@@ -1,4 +1,4 @@
-package kh.com.sela.developer.basic.sela_food_app.screens.profile_screen
+package kh.com.sela.developer.basic.sela_food_app.presentation.profile_screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

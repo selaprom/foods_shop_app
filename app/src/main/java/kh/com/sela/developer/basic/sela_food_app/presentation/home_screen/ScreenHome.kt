@@ -1,7 +1,8 @@
-package kh.com.sela.developer.basic.sela_food_app.screens.home_screen
+package kh.com.sela.developer.basic.sela_food_app.presentation.home_screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,8 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.NorthWest
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
@@ -30,11 +29,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,74 +44,113 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kh.com.sela.developer.basic.sela_food_app.screens.components.AutoSlideCards
-import kh.com.sela.developer.basic.sela_food_app.screens.components.CategoryChip
+import androidx.lifecycle.viewmodel.compose.viewModel
+import kh.com.sela.developer.basic.sela_food_app.Util.ErrorScreen
+import kh.com.sela.developer.basic.sela_food_app.Util.LoadingScreen
+import kh.com.sela.developer.basic.sela_food_app.data.base.BaseUiState
+import kh.com.sela.developer.basic.sela_food_app.presentation.components.AutoSlideCards
+import kh.com.sela.developer.basic.sela_food_app.presentation.components.CategoryChip
+import kh.com.sela.developer.basic.sela_food_app.presentation.components.ProductGrid
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenHome() {
+fun ScreenHome(
+    viewModel: HomeVM = viewModel()
+) {
     var showSearchSheet by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Surface(
-            modifier = Modifier
-                .padding(all = 16.dp)
-                .fillMaxWidth()
-                .height(50.dp)
-                .clickable {
-                    showSearchSheet = true
-                },
-            shape = RoundedCornerShape(12.dp),
-            color = Color.White,
-            border = BorderStroke(1.8.dp, OldGreen),
-        ) {
-            Row(
-                modifier = Modifier.padding(
-                    horizontal = 16.dp,
-                    vertical = 12.dp
-                ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Search,
-                    contentDescription = "Search",
-                    Modifier.size(26.dp)
-                )
-
-                Spacer(Modifier.width(12.dp))
-
-                Text(
-                    fontSize = 20.sp,
-                    text = "Search...",
-
-                    color = MaterialTheme.colorScheme
-                        .onSurfaceVariant
-                )
-            }
-        }
-        AutoSlideCards()
-        CategoryChip(
-            onSelected = {
-                println("Selected category: $it")
-            }
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        ) {
-            Text(
-                text = "Popular",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
-        }
-
-
+    val productUiState = viewModel.productUiState.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.getProducts()
     }
+
+
+   when(val state =productUiState.value){
+       is BaseUiState.Loading -> {
+           LoadingScreen()
+       }
+       is BaseUiState.Success -> {
+           Column(
+               modifier = Modifier
+                   .fillMaxSize()
+                   .verticalScroll(rememberScrollState()),
+               verticalArrangement = Arrangement.Top,
+               horizontalAlignment = Alignment.CenterHorizontally
+           ) {
+               Surface(
+                   modifier = Modifier
+                       .padding(all = 16.dp)
+                       .fillMaxWidth()
+                       .height(50.dp)
+                       .clickable {
+                           showSearchSheet = true
+                       },
+                   shape = RoundedCornerShape(12.dp),
+                   color = Color.White,
+                   border = BorderStroke(1.8.dp, OldGreen),
+               ) {
+                   Row(
+                       modifier = Modifier.padding(
+                           horizontal = 16.dp,
+                           vertical = 12.dp
+                       ),
+                       verticalAlignment = Alignment.CenterVertically
+                   ) {
+                       Icon(
+                           imageVector = Icons.Default.Search,
+                           contentDescription = "Search",
+                           Modifier.size(26.dp)
+                       )
+
+                       Spacer(Modifier.width(12.dp))
+
+                       Text(
+                           fontSize = 20.sp,
+                           text = "Search...",
+
+                           color = MaterialTheme.colorScheme
+                               .onSurfaceVariant
+                       )
+                   }
+               }
+               AutoSlideCards()
+               CategoryChip(
+                   onSelected = {
+                       println("Selected category: $it")
+                   }
+               )
+               Row(
+                   modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+               ) {
+                   Text(
+                       text = "Popular",
+                       style = MaterialTheme.typography.titleMedium,
+                       fontWeight = FontWeight.SemiBold
+                   )
+               }
+
+            ProductGrid(
+                products = state.data,
+                onProductClick = {
+                      println("Clicked on product: $it")
+                }
+            )
+
+
+           }
+       }
+       is BaseUiState.Error -> {
+           println("Error:==========> ${state.message}")
+           ErrorScreen(
+               message = state.message,
+               onRetry = {
+                   viewModel.getProducts()
+               }
+           )
+       }
+       else -> {}
+   }
 
 
 
