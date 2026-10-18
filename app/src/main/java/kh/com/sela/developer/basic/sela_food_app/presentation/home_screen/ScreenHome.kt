@@ -49,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import kh.com.sela.developer.basic.sela_food_app.Util.ErrorScreen
 import kh.com.sela.developer.basic.sela_food_app.Util.LoadingScreen
 import kh.com.sela.developer.basic.sela_food_app.data.base.BaseUiState
+import kh.com.sela.developer.basic.sela_food_app.data.response.ProductDto
 import kh.com.sela.developer.basic.sela_food_app.presentation.components.AutoSlideCards
 import kh.com.sela.developer.basic.sela_food_app.presentation.components.CategoryChip
 import kh.com.sela.developer.basic.sela_food_app.presentation.components.ProductGrid
@@ -57,7 +58,8 @@ import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenHome(
-    viewModel: HomeVM = viewModel()
+    viewModel: HomeVM = viewModel(),
+    onProductClick: (ProductDto) -> Unit={},
 ) {
     var showSearchSheet by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -74,6 +76,7 @@ fun ScreenHome(
        is BaseUiState.Success -> {
            Column(
                modifier = Modifier
+                   .imePadding()
                    .fillMaxSize()
                    .verticalScroll(rememberScrollState()),
                verticalArrangement = Arrangement.Top,
@@ -125,26 +128,20 @@ fun ScreenHome(
                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                ) {
                    Text(
-                       text = "Popular",
+                       text = "All Products",
                        style = MaterialTheme.typography.titleMedium,
                        fontWeight = FontWeight.SemiBold
                    )
                }
 
-               Box(
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .fillMaxHeight()
-                       .height(1950.dp)
-
-               ) {
-                   ProductGrid(
-                       products = state.data,
-                       onProductClick = {
-                           println("Clicked on product: $it")
-                       }
-                   )
-               }
+               ProductGrid(
+                   products = state.data,
+                   onProductClick = { product ->
+                       onProductClick(product)
+                       println("Clicked on product: $product")
+                   },
+                   modifier = Modifier.fillMaxWidth()
+               )
 
 
            }

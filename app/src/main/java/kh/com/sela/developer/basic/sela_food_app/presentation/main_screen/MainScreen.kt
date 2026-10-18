@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kh.com.sela.developer.basic.sela_food_app.data.response.ProductDto
 import kh.com.sela.developer.basic.sela_food_app.presentation.components.BottomNavigationBar
 import kh.com.sela.developer.basic.sela_food_app.presentation.favorit_screen.ScreenFavorite
 import kh.com.sela.developer.basic.sela_food_app.presentation.home_screen.ScreenHome
@@ -46,6 +48,7 @@ import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 fun MainScreen(
     onClicktoCart: () -> Unit,
     onSearchClick: () -> Unit,
+    onProductClick: (ProductDto) -> Unit
 ) {
     var itemselected by remember { mutableStateOf<String>("Home") }
 
@@ -54,7 +57,10 @@ fun MainScreen(
         colors = listOf(OldGreen, OldGreen.copy(alpha = 0.6f))
     )
     Scaffold(
-        modifier = Modifier.background(gradient),
+        modifier = Modifier
+            .background(gradient)
+            .fillMaxSize()
+            .imePadding(),
         topBar = {
             TopAppBar(
                 modifier = Modifier.background(gradient),
@@ -110,7 +116,10 @@ fun MainScreen(
 
         ) {
             when (itemselected) {
-                "Home" -> ScreenHome()
+                "Home" -> ScreenHome(onProductClick = {product->
+                    onProductClick(product)
+
+                })
                 "Favorite" -> ScreenFavorite()
                 "Order" -> ScreenOrder()
                 "Account" -> ScreenProfile()

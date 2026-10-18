@@ -12,6 +12,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import kh.com.sela.developer.basic.sela_food_app.presentation.cart_screen.ScreenCart
 import kh.com.sela.developer.basic.sela_food_app.presentation.main_screen.MainScreen
+import kh.com.sela.developer.basic.sela_food_app.presentation.product_detail_screen.ScreenProductDetails
 
 @Composable
 fun AppNavigation() {
@@ -47,16 +48,29 @@ fun AppNavigation() {
                 MainScreen(
                     onClicktoCart = {
                         backStack.add(ScreenCartRoute)
+                    },
+                    onSearchClick = {
+                        //
+                    },
+                    onProductClick = {product->
+                        backStack.add(ProductDetails(product))
                     }
-                ){
-                    //
-                }
+                )
             }
             entry<ScreenCartRoute> {
                 ScreenCart(
                     onBack = {
                         backStack.removeLastOrNull()
                     }
+                )
+            }
+            entry<ProductDetails> {
+                ScreenProductDetails(
+                    onBack = {
+                        backStack.removeLastOrNull()
+                    },
+                    product = it.product,
+                    onBuyNow = {product,quantity->}
                 )
             }
 

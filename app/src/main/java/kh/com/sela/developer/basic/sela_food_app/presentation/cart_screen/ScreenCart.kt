@@ -16,7 +16,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import kh.com.sela.developer.basic.sela_food_app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +37,7 @@ fun ScreenCart(
                         onBack()
                     }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
+                            painter = painterResource(R.drawable.ic_back),
                             contentDescription = "Back",
                             modifier = Modifier.size(24.dp)
                         )
