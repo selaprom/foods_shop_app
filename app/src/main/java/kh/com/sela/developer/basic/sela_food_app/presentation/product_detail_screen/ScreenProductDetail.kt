@@ -92,7 +92,7 @@ fun ScreenProductDetails(
                 .align(Alignment.TopCenter)
         ){
             CircleIconButton(
-                onClick = {},
+                onClick = onBack,
                 icon = R.drawable.ic_back,
                 modifier = Modifier.align(Alignment.CenterStart)
             )
