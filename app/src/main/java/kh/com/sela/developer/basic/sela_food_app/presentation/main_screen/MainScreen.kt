@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kh.com.sela.developer.basic.sela_food_app.data.response.ProductDto
+import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ProductDto
 import kh.com.sela.developer.basic.sela_food_app.presentation.components.BottomNavigationBar
 import kh.com.sela.developer.basic.sela_food_app.presentation.favorit_screen.ScreenFavorite
 import kh.com.sela.developer.basic.sela_food_app.presentation.home_screen.ScreenHome

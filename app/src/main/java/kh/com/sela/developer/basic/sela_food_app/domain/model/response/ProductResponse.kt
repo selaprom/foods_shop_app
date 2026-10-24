@@ -1,16 +1,16 @@
-package kh.com.sela.developer.basic.sela_food_app.data.response
+package kh.com.sela.developer.basic.sela_food_app.domain.model.response
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiResponse<T>(
-    val data: T
+data class ApiResponse(
+    val data: List<ProductDto>
 )
 @Serializable
 data class ProductDto(
     val id: Int,
-    @SerialName("category_id") val categoryId: Int,
+    @SerialName("category_id") val categoryId: Int? = null,
     val category: String,
     val name: String,
     val description: String? = null,

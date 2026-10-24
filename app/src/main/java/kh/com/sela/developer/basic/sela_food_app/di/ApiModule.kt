@@ -7,9 +7,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kh.com.sela.developer.basic.sela_food_app.data.remote.api.FavoriteApiService
 
 import retrofit2.Retrofit
 import javax.inject.Singleton
+import kotlin.jvm.java
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -21,6 +23,11 @@ object ApiModule {
     @Singleton
     fun provideProductApi(retrofit: Retrofit): ProductApiService =
         retrofit.create(ProductApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideFavoriteApi(retrofit: Retrofit): FavoriteApiService =
+        retrofit.create(FavoriteApiService::class.java)
 
 
 }

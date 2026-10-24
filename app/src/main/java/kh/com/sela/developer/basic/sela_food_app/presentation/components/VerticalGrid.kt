@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import kh.com.sela.developer.basic.sela_food_app.R
-import kh.com.sela.developer.basic.sela_food_app.data.response.ApiResponse
-import kh.com.sela.developer.basic.sela_food_app.data.response.ProductDto
+import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ApiResponse
+import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ProductDto
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.BackGroundCard
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.Orange
@@ -43,7 +41,7 @@ import kh.com.sela.developer.basic.sela_food_app.ui.theme.Orange
 
 @Composable
 fun ProductGrid(
-    products: ApiResponse<List<ProductDto>>,
+    products: ApiResponse,
     onProductClick: (ProductDto) -> Unit,
     modifier: Modifier = Modifier
 ) {

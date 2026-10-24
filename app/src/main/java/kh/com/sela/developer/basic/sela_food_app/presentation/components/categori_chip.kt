@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,14 +29,15 @@ import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 
 @Composable
 fun CategoryChip(
-    onSelected: (String) -> Unit = {},
-    categoryLabel: List<String> = listOf("All", "Food", "Drink", "Dessert")
-) {
-    var currentSelected by remember { mutableStateOf("All") }
+    onSelected: (String) -> Unit,
+    currentSelected: String
+    ) {
+    val categoryLabel= listOf("All", "Food", "Drink", "Dessert")
+
 
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(vertical = 16.dp)
             ,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -46,11 +48,11 @@ fun CategoryChip(
             val selected = label == currentSelected
 
             AssistChip(
-                modifier = Modifier.height(50.dp),
-                onClick = { currentSelected = label
+                modifier = Modifier.height(40.dp),
+                onClick = {
                           onSelected(label)
                           },
-                shape = RoundedCornerShape(15.dp),
+                shape = RoundedCornerShape(10.dp),
                 colors = AssistChipDefaults.assistChipColors(
                     containerColor = if (selected) OldGreen
                     else MaterialTheme.colorScheme.surface,

@@ -29,9 +29,10 @@ import kotlinx.coroutines.delay
 @Composable
 fun AutoSlideCards(
     modifier: Modifier = Modifier,
-    items: List<Int> = listOf(R.drawable.promotion_01, R.drawable.promotion_02, R.drawable.promotion_03, R.drawable.promotion_04),
     intervalMs: Long = 3000L,
 ) {
+    val items = listOf(R.drawable.promotion_01, R.drawable.promotion_02, R.drawable.promotion_03, R.drawable.promotion_04)
+
     val pagerState = rememberPagerState(pageCount = { items.size })
     val isDragged by pagerState.interactionSource.collectIsDraggedAsState()
 
@@ -49,7 +50,7 @@ fun AutoSlideCards(
     Column(modifier = modifier) {
         HorizontalPager(
             state = pagerState,
-            contentPadding = PaddingValues(horizontal = 24.dp),
+            contentPadding = PaddingValues(horizontal = 0.dp),
             pageSpacing = 12.dp,
             modifier = Modifier.fillMaxWidth()
         ) { page ->
@@ -58,7 +59,8 @@ fun AutoSlideCards(
                 colors = CardDefaults.cardColors(containerColor = OldGreen),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(168.dp)
+                    .height(155.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Image(
