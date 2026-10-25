@@ -1,8 +1,10 @@
 package kh.com.sela.developer.basic.sela_food_app.data.repository
 
 import kh.com.sela.developer.basic.sela_food_app.data.remote.api.FavoriteApiService
+import kh.com.sela.developer.basic.sela_food_app.domain.model.request.DeleteFavoriteParams
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.FavoriteResponse
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ProductDto
+import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ToggleFavoriteResponse
 import kh.com.sela.developer.basic.sela_food_app.domain.repository.FavoriteRepository
 import retrofit2.Response
 import javax.inject.Inject
@@ -22,11 +24,10 @@ class FavoriteRepositoryImpl @Inject constructor(private val favoriteApiService:
         return favoriteApiService.createFavorite(userId, productId)
     }
 
-    override suspend fun deleteFavorite(
-        userId: Int,
-        productId: Int
-    ): Response<Unit> {
-        return favoriteApiService.deleteFavorite(userId, productId)
+    override suspend fun toggleFavorite(
+        userIdProductId: DeleteFavoriteParams
+    ): Response<ToggleFavoriteResponse> {
+        return favoriteApiService.toggleFavorite(userIdProductId)
     }
-
 }
+

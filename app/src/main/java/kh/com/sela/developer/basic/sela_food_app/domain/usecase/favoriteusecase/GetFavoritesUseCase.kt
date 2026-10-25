@@ -15,11 +15,10 @@ class GetFavoritesUseCase @Inject constructor(private val favoriteRepository: Fa
                 return flow {
 
                     try {
-                       // emit(BaseUiState.Loading)
+                        emit(BaseUiState.Loading)
                         val response = favoriteRepository.getFavorites(param)
                         if (response.isSuccessful) {
                             response.body()?.let { data ->
-                                println("data=========>from usecase $data")
                                 emit(BaseUiState.Success(data))
                             }
                         } else {

@@ -20,7 +20,7 @@ class HomeVM @Inject constructor(
     val getProductUseCase: GetProductUseCase,
     val getProductByCategoryUseCase: GetProductByCategoryUseCase
 ) : ViewModel() {
-    private val _productUiState = MutableStateFlow<BaseUiState<ApiResponse>>(BaseUiState.Loading)
+    private val _productUiState = MutableStateFlow<BaseUiState<ApiResponse>>(BaseUiState.None)
     private val _categoryType = MutableStateFlow<String>("All")
     val productUiState = _productUiState.asStateFlow()
     val categoryType = _categoryType.asStateFlow()

@@ -74,7 +74,7 @@ fun ScreenHome(
 
     val productUiState = viewModel.productUiState.collectAsState()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(productUiState) {
         viewModel.getProducts()
 
     }

@@ -15,7 +15,7 @@ class GetProductUseCase @Inject constructor(private val productRepository: Produ
     override suspend fun execute(param: Unit): Flow<BaseUiState<ApiResponse>> {
         return flow {
             try {
-               // emit(BaseUiState.Loading)
+                emit(BaseUiState.Loading)
                 val response = productRepository.getProducts()
                 if (response.isSuccessful) {
                    response.body()?.let { data ->
