@@ -74,10 +74,18 @@ fun ScreenHome(
 
     val productUiState = viewModel.productUiState.collectAsState()
 
-    LaunchedEffect(productUiState) {
+    var selectFavorit = viewModel.listOfselectProduct.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.loadFavorites(1)
+        println("load favorite===========>${viewModel.listOfselectProduct.value}")
+
+
+    }
+    LaunchedEffect(Unit) {
         viewModel.getProducts()
 
     }
+
 
 
     when (val state = productUiState.value) {
@@ -193,11 +201,19 @@ fun ScreenHome(
                     }
                 }
                 items(filteredProducts.size, key = { filteredProducts[it].id }) {
+                    val wasFavorite = selectFavorit.value.contains(filteredProducts[it].id)
                     ItemCard(
                         product = filteredProducts[it],
                         onProductClick = {
                             onProductClick(it)
-                        }
+                        },
+                        onClikFavorite = {productId->
+                            viewModel.setListOfselectProduct(productId)
+                            viewModel.toggleSelecteFavoriteProduct(1, productId)
+
+                        },
+                        wasFavorite = wasFavorite,
+
                     )
                 }
             }

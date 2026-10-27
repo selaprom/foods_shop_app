@@ -40,7 +40,8 @@ fun FavoriteItemGrid(
     onClik: (product_id: Int) -> Unit,
     onClikFavorite: () -> Unit,
     product: FavoriteDto,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isFavorite: Boolean
 ) {
     Card(
         modifier = Modifier
@@ -80,10 +81,10 @@ fun FavoriteItemGrid(
                 // Favorite button at the top-right of the image
                 IconToggleButtonFavorite(
                     onClick = onClikFavorite,
-                    icon = R.drawable.ic_favorit,
 
                     color = OldGreen,
-                    backgroundColor = Color.White
+                    backgroundColor = Color.White,
+                    isFavorite = isFavorite
                 )
             }
             Spacer(modifier = Modifier.height(15.dp))

@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +51,9 @@ fun MainScreen(
     onSearchClick: () -> Unit,
     onProductClick: (ProductDto) -> Unit
 ) {
-    var itemselected by remember { mutableStateOf<String>("Home") }
+    var itemselected by rememberSaveable { mutableStateOf<String>("Home") }
+
+
 
 
     val gradient = Brush.verticalGradient(
@@ -107,7 +110,7 @@ fun MainScreen(
                 }
             )
         }
-    )  { paddingValues ->
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -116,10 +119,13 @@ fun MainScreen(
 
         ) {
             when (itemselected) {
-                "Home" -> ScreenHome(onProductClick = {product->
-                    onProductClick(product)
+                "Home" -> ScreenHome(
+                    onProductClick = { product ->
+                        onProductClick(product)
+                    },
 
-                })
+                )
+
                 "Favorite" -> ScreenFavorite()
                 "Order" -> ScreenOrder()
                 "Account" -> ScreenProfile()

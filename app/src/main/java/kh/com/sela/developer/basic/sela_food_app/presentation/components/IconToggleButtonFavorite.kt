@@ -13,12 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import kh.com.sela.developer.basic.sela_food_app.R
+
 @Composable
 fun IconToggleButtonFavorite(
     onClick: () -> Unit,
-    icon: Int,
     color: Color? = null,
-    backgroundColor: Color? = null
+    backgroundColor: Color? = null,
+    isFavorite: Boolean
 ) {
     Surface(
         onClick = onClick,
@@ -30,7 +32,7 @@ fun IconToggleButtonFavorite(
     ) {
         Box(contentAlignment = Alignment.Center) {
             Icon(
-                painter = painterResource(id = icon),
+                painter = painterResource(if (isFavorite) R.drawable.ic_favorit else R.drawable.ic_unfavorit),
                 contentDescription = "Back",
                 modifier = Modifier.size(25.dp),
                 tint = color ?: Color.Black

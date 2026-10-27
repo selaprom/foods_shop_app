@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,7 +37,12 @@ import kh.com.sela.developer.basic.sela_food_app.ui.theme.Orange
 
 
 @Composable
-fun ItemCard(product: ProductDto, onProductClick: (ProductDto) -> Unit){
+fun ItemCard(
+    product: ProductDto,
+    onProductClick: (ProductDto) -> Unit,
+    onClikFavorite: (product_id: Int) -> Unit,
+    wasFavorite: Boolean
+) {
     Card(
         onClick = { onProductClick(product) },
         shape = RoundedCornerShape(16.dp),
@@ -45,19 +52,37 @@ fun ItemCard(product: ProductDto, onProductClick: (ProductDto) -> Unit){
             defaultElevation = 2.dp
         ),
 
-    ) {
-        AsyncImage(
-            model = product.imageUrl,
-            contentDescription = product.name,
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(132.dp)
-        )
-        Column(Modifier.background(Color.Transparent)
+        ) {
+        Box(
 
-            .padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(1.dp)) {
+            contentAlignment = Alignment.TopEnd
+        ) {
+            AsyncImage(
+                model = product.imageUrl,
+                contentDescription = product.name,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(132.dp)
+            )
+            IconToggle(
+                onClick = {
+                    onClikFavorite(
+                        product.id
+                    )
+                },
+                wasFavorite = wasFavorite
+            )
+
+        }
+
+        Column(
+            Modifier
+                .background(Color.Transparent)
+
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
             Text(
                 product.name,
                 maxLines = 1,
@@ -76,9 +101,10 @@ fun ItemCard(product: ProductDto, onProductClick: (ProductDto) -> Unit){
                 Icon(
                     modifier = Modifier.size(12.dp),
                     tint = Orange,
-                    painter = painterResource(id = R.drawable.ic_start), contentDescription = null)
-                Text("4.7", color = Color.Black,fontWeight = FontWeight.Bold,fontSize = 12.sp )
-                Text("(503 review)", color = Color.Gray.copy(0.7f),fontSize = 12.sp )
+                    painter = painterResource(id = R.drawable.ic_start), contentDescription = null
+                )
+                Text("4.7", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                Text("(503 review)", color = Color.Gray.copy(0.7f), fontSize = 12.sp)
             }
             Box(
                 contentAlignment = Alignment.Center,
@@ -88,9 +114,37 @@ fun ItemCard(product: ProductDto, onProductClick: (ProductDto) -> Unit){
 
                     .background(color = OldGreen, shape = RoundedCornerShape(8.dp))
             ) {
-                Text("$${product.price}", color = Color.White,fontSize = 12.sp)
+                Text("$${product.price}", color = Color.White, fontSize = 12.sp)
             }
         }
     }
 
+}
+
+@Composable
+fun IconToggle(
+    onClick: () -> Unit,
+    backgroundColor: Color? = null,
+    wasFavorite: Boolean
+) {
+    Surface(
+        onClick = onClick,
+        shape = CircleShape,
+        color = backgroundColor ?: Color.White,
+        shadowElevation = 4.dp,
+        modifier = Modifier
+            .size(45.dp)
+            .padding(end = 10.dp, top = 10.dp)
+
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                painter = painterResource(id = if(wasFavorite) R.drawable.ic_favorit else R.drawable.ic_unfavorit),
+                contentDescription = "Toggle Product",
+                modifier = Modifier.size(25.dp),
+                tint = OldGreen
+            )
+
+        }
+    }
 }
