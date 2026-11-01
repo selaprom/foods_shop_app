@@ -5,5 +5,15 @@ import kotlinx.serialization.Serializable
 
 data object MainScreenRoute
 data object ScreenCartRoute
+
+data object AppNavigation
+data object LoginRoute
+
+data object SignupRoute
+
+data object WelcomeRoute
+
+
+data object SplashRoute
 @Serializable
 data class ProductDetails( val product: ProductDto)

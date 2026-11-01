@@ -75,4 +75,6 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     implementation(libs.okhttp)
+    //data store manager
+    implementation(libs.androidx.datastore.preferences)
 }

@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import dagger.hilt.android.AndroidEntryPoint
 import kh.com.sela.developer.basic.sela_food_app.navigation.AppNavigation
+import kh.com.sela.developer.basic.sela_food_app.presentation.appnavigation_screen.AppNavigationScreen
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.Sela_food_appTheme
 
 @AndroidEntryPoint
@@ -16,6 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Sela_food_appTheme {
                 AppNavigation()
+               // AppNavigationScreen()
             }
         }
     }
