@@ -22,7 +22,7 @@ fun SplashScreen(onFinished: () -> Unit) {
     val currentOnFinished by rememberUpdatedState(onFinished)
 
     LaunchedEffect(Unit) {
-        delay(2000)
+        delay(3000)
         currentOnFinished()
     }
 

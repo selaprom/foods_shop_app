@@ -38,7 +38,7 @@ private fun checkAppStart() {
         val isFirstTime =
             dataStoreManager.isFirstTime.first()
 
-        if (isFirstTime) {
+        if (isFirstTime ) {
 
             _startDestination.value =
                 AppStartDestination.Welcome
@@ -58,19 +58,8 @@ private fun checkAppStart() {
     }
 }
     fun completeOnboarding() {
-
         viewModelScope.launch {
-
             dataStoreManager.saveFirstTime(false)
-
-            val token = tokenManager.token
-
-            _startDestination.value =
-                if (!token.isNullOrBlank()) {
-                    AppStartDestination.Main
-                } else {
-                    AppStartDestination.Login
-                }
         }
     }
 }

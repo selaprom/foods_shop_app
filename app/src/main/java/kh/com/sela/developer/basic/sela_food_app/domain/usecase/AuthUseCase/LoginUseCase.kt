@@ -17,6 +17,8 @@ class LoginUseCase @Inject constructor(private val authRepository: AuthRepositor
                 val response = authRepository.login(param)
                 if (response.isSuccessful){
                     emit(BaseUiState.Success(response.body()!!))
+                }else{
+                    emit(BaseUiState.Error(response.message()))
                 }
 
             }catch (e: Exception){

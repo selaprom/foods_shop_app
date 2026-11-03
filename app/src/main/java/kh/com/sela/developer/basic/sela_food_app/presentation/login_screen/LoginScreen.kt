@@ -1,6 +1,12 @@
 package kh.com.sela.developer.basic.sela_food_app.presentation.login_screen
 
 import android.util.Patterns
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,14 +25,20 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.magnifier
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,6 +53,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,18 +73,25 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import kh.com.sela.developer.basic.sela_food_app.R
+
+import kh.com.sela.developer.basic.sela_food_app.data.base.BaseUiState
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OrangeColor
 
 @Preview(showBackground = true)
 @Composable
 fun LoginScreen(
+    onForward: (userIdi: Int) -> Unit = {},
     onClicktoSignup: () -> Unit = {},
+    loginVM: LoginVM = viewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf("") }
@@ -78,8 +99,11 @@ fun LoginScreen(
     var isPasswordHidden by remember { mutableStateOf(true) }
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-
+    var isLoading by remember { mutableStateOf(false) }
+    var isError by remember { mutableStateOf(false) }
     var passwordError by remember { mutableStateOf("") }
+
+    val loginUiState by loginVM.loginUiState.collectAsState()
 
     fun isEmail(email: String): Boolean {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches()
@@ -101,9 +125,33 @@ fun LoginScreen(
         }
     }
 
-    val isFormValid = isEmail(email) &&  password.length >= 4
+    val isFormValid = isEmail(email) && password.length >= 4
 
+    LaunchedEffect(loginUiState) {
 
+        when (val state = loginUiState) {
+            is BaseUiState.Loading -> {
+                isLoading = true
+            }
+
+            is BaseUiState.Success -> {
+                isLoading = false
+                onForward(state.data.user.id)
+
+            }
+            is BaseUiState.Error -> {
+                isError = true
+                isLoading = false
+
+            }
+
+            else -> {
+                isLoading = false
+
+            }
+        }
+
+    }
 
 
     Column(
@@ -269,7 +317,9 @@ fun LoginScreen(
                         modifier = Modifier
                             .height(50.dp)
                             .fillMaxWidth(),
-                        onClick = {},
+                        onClick = {
+                            loginVM.login(email, password)
+                        },
                     ) {
                         Text("Login", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     }
@@ -420,4 +470,135 @@ fun LoginScreen(
 
 
     }
+    if (isLoading) {
+        Dialog(
+            onDismissRequest = {}
+        ) {
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn(tween(300)) +
+                        scaleIn(
+                            initialScale = 0.85f,
+                            animationSpec = tween(300)
+                        )
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = Color.White
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Loading",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                        CircularProgressIndicator(
+                            color = OldGreen,
+                            strokeWidth = 4.dp
+                        )
+
+                        Text(
+                            text = "Please wait...",
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    LoginErrorDialog(
+        isError = isError,
+        message = "Invalid email or password",
+        onDismiss = {
+            isError = false
+        }
+    )
 }
+
+@Composable
+fun LoginErrorDialog(
+    isError: Boolean,
+    message: String,
+    onDismiss: () -> Unit
+) {
+    if (isError) {
+        Dialog(
+            onDismissRequest = onDismiss
+        ) {
+            AnimatedVisibility(
+                visible = isError,
+                enter = fadeIn(
+                    animationSpec = tween(300)
+                ) + scaleIn(
+                    initialScale = 0.8f,
+                    animationSpec = tween(300)
+                ),
+                exit = fadeOut(
+                    animationSpec = tween(200)
+                ) + scaleOut(
+                    targetScale = 0.8f,
+                    animationSpec = tween(200)
+                )
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = Color.White
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+
+                        Icon(
+                            imageVector = Icons.Default.Error,
+                            contentDescription = null,
+                            tint = Color.Red,
+                            modifier = Modifier.size(48.dp)
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(16.dp)
+                        )
+
+                        Text(
+                            text = "Login Failed",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
+
+                        Text(
+                            text = message,
+                            textAlign = TextAlign.Center
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(24.dp)
+                        )
+
+                        Button(
+                            onClick = onDismiss,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = OldGreen
+                            )
+                        ) {
+                            Text("OK")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+

@@ -1,5 +1,6 @@
 package kh.com.sela.developer.basic.sela_food_app.data.repository
 
+import kh.com.sela.developer.basic.sela_food_app.data.local.TokenStore
 import kh.com.sela.developer.basic.sela_food_app.data.remote.api.AuthApiService
 import kh.com.sela.developer.basic.sela_food_app.domain.model.request.LoginRequest
 import kh.com.sela.developer.basic.sela_food_app.domain.model.request.RegisterRequest
@@ -10,9 +11,22 @@ import kh.com.sela.developer.basic.sela_food_app.domain.repository.AuthRepositor
 import retrofit2.Response
 import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(private val authApiService: AuthApiService) : AuthRepository {
+class AuthRepositoryImpl @Inject constructor(private val authApiService: AuthApiService,private val tokenStore: TokenStore) : AuthRepository {
     override suspend fun login(loginRequest: LoginRequest): Response<LoginResponse> {
-        return authApiService.login(loginRequest)
+       val response = authApiService.login(loginRequest)
+        if (response.isSuccessful){
+            var result = response.body()?: throw Exception("Response body is null")
+            tokenStore.token = result.token
+
+        return response
+        }
+        else{
+            throw Exception("Invalid email or password")
+        }
+
+
+
+
     }
 
     override suspend fun logout(): Response<LogoutResponse> {

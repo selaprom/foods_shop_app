@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import kh.com.sela.developer.basic.sela_food_app.Util.AppStartDestination
@@ -26,19 +27,23 @@ import kh.com.sela.developer.basic.sela_food_app.presentation.welcome_screen.Wel
 
 @Composable
 fun AppNavigation(
-    viewModel: AppNavigationVM= hiltViewModel()
+    viewModel: AppNavigationVM= viewModel(),
 ) {
-    val backStack = remember{ mutableStateListOf<Any>(SplashRoute) }
 
+    val backStack = remember{ mutableStateListOf<Any>(SplashRoute) }
     val startDestination by
     viewModel.startDestination.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
 
+    LaunchedEffect(startDestination) {
         val destination = when (startDestination) {
+
             AppStartDestination.Loading -> null
+
             AppStartDestination.Welcome -> WelcomeRoute
+
             AppStartDestination.Login -> LoginRoute
+
             AppStartDestination.Main -> MainScreenRoute
         }
 
@@ -47,6 +52,7 @@ fun AppNavigation(
             backStack.add(destination)
         }
     }
+
 
     NavDisplay(
         backStack = backStack,
@@ -80,24 +86,27 @@ fun AppNavigation(
                     }
                 )
             }
+
             entry<WelcomeRoute> {
-               WelcomeScreen(
-                   onLoginClick = {
-                       backStack.add(LoginRoute)
-                       viewModel.completeOnboarding()
-                   },
-                   onSignupClick = {
-                       backStack.add(SignupRoute)
-                       viewModel.completeOnboarding()
+                WelcomeScreen(
+                    onLoginClick = {
+                        viewModel.completeOnboarding()
+                        backStack.add(LoginRoute)
+                    },
 
-
-                   }
-               )
+                    onSignupClick = {
+                        viewModel.completeOnboarding()
+                        backStack.add(SignupRoute)
+                    }
+                )
             }
             entry<LoginRoute> {
                 LoginScreen(
                     onClicktoSignup = {
                         backStack.add(SignupRoute)
+                    },
+                    onForward = {userId->
+                        backStack.add(MainScreenRoute)
                     }
                 )
             }
