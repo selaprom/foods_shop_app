@@ -2,6 +2,7 @@ package kh.com.sela.developer.basic.sela_food_app.presentation.profile_screen
 
 import android.view.Surface
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -37,7 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import itemshow
 import kh.com.sela.developer.basic.sela_food_app.R
+import kh.com.sela.developer.basic.sela_food_app.presentation.components.SignOutButton
 import kh.com.sela.developer.basic.sela_food_app.presentation.components.itemInfo
+import kh.com.sela.developer.basic.sela_food_app.presentation.components.itemService
+import kh.com.sela.developer.basic.sela_food_app.presentation.components.ortherServices
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 
 @Preview(showBackground = true)
@@ -48,7 +52,7 @@ fun ScreenProfile() {
             .fillMaxSize()
             .padding(10.dp),
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
             modifier = Modifier.padding(top = 10.dp),
@@ -65,14 +69,14 @@ fun ScreenProfile() {
         ) {
             Row(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(12.dp)
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Surface(
 
-                    modifier = Modifier.size(75.dp),
+                    modifier = Modifier.size(65.dp),
                     color = OldGreen,
                     shape = CircleShape,
 
@@ -81,7 +85,7 @@ fun ScreenProfile() {
                         Icons.Default.Person,
                         contentDescription = null,
                         tint = Color.White,
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(10.dp)
 
 
                     )
@@ -92,10 +96,10 @@ fun ScreenProfile() {
                     modifier = Modifier
 
                         .weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Text(text = "Ly Hour", fontWeight = FontWeight.Bold, fontSize = 22.sp)
-                    Text(text = "lyhour@gmail.com", fontSize = 19.sp)
+                    Text(text = "Ly Hour", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    Text(text = "lyhour@gmail.com", fontSize = 17.sp)
                     Surface(
                         modifier = Modifier, shape = RoundedCornerShape(8.dp), color = OldGreen,
                         contentColor = Color.White
@@ -103,7 +107,7 @@ fun ScreenProfile() {
                         Text(
                             text = "VIP Gold Member",
                             fontSize = 13.sp,
-                            modifier = Modifier.padding(all = 8.dp)
+                            modifier = Modifier.padding(all = 6.dp)
                         )
                     }
                 }
@@ -126,7 +130,40 @@ fun ScreenProfile() {
                         subtitle = item.subtitle
                     )
                 }
+
             }
         }
+        Box(
+            modifier = Modifier
+                .height(380.dp)
+                .fillMaxWidth(),
+        ) {
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxSize(),
+verticalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
+
+                ortherServices.forEachIndexed { index, item ->
+                    var isFirst = index == 0
+                    var isLast = index == ortherServices.size - 1
+
+                    itemService(
+                        icon = item.icon,
+                        title = item.title,
+                        isFirst = isFirst,
+                        isLast = isLast,
+                        onClick = {}
+                    )
+                }
+
+
+            }
+        }
+        //
+        SignOutButton(
+            onClick = {},
+            modifier = Modifier
+        )
     }
 }

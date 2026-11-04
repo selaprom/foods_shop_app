@@ -31,7 +31,7 @@ fun itemshow(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(10.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -40,8 +40,8 @@ fun itemshow(
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-            Text(text = title)
-            Text(text = subtitle)
+            Text(text = title, fontSize = 14.sp)
+            Text(text = subtitle, fontSize = 14.sp)
         }
     }
 }
