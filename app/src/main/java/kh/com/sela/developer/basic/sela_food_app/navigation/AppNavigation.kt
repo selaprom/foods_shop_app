@@ -159,7 +159,6 @@ fun AppNavigation(
                         backStack.removeLastOrNull()
                     },
                     product = it.product,
-                    onBuyNow = {product,quantity->}
                 )
             }
             entry<AppNavigation> {

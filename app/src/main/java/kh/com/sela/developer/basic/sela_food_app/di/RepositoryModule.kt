@@ -6,9 +6,11 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kh.com.sela.developer.basic.sela_food_app.data.repository.AuthRepositoryImpl
+import kh.com.sela.developer.basic.sela_food_app.data.repository.CartRepositoryImpl
 import kh.com.sela.developer.basic.sela_food_app.data.repository.FavoriteRepositoryImpl
 import kh.com.sela.developer.basic.sela_food_app.data.repository.ProductRepositoryImpl
 import kh.com.sela.developer.basic.sela_food_app.domain.repository.AuthRepository
+import kh.com.sela.developer.basic.sela_food_app.domain.repository.CartRepository
 import kh.com.sela.developer.basic.sela_food_app.domain.repository.FavoriteRepository
 import kh.com.sela.developer.basic.sela_food_app.domain.repository.ProductRepository
 import javax.inject.Singleton
@@ -34,5 +36,11 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         impl: AuthRepositoryImpl
     ): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCartRepository(
+        impl: CartRepositoryImpl
+    ): CartRepository
 }
 

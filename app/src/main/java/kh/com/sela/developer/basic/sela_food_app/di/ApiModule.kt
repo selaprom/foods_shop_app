@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import kh.com.sela.developer.basic.sela_food_app.data.remote.api.AuthApiService
+import kh.com.sela.developer.basic.sela_food_app.data.remote.api.CartService
 import kh.com.sela.developer.basic.sela_food_app.data.remote.api.FavoriteApiService
 
 import retrofit2.Retrofit
@@ -34,6 +35,11 @@ object ApiModule {
     @Singleton
     fun provideAuthApi(retrofit: Retrofit): AuthApiService =
         retrofit.create(AuthApiService::class.java)
+
+    @Provides
+    @Singleton
+    fun provideCartApi(retrofit: Retrofit): CartService =
+        retrofit.create(CartService::class.java)
 
 
 
