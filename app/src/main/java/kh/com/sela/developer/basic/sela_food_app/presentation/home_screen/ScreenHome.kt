@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -67,6 +69,7 @@ import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 fun ScreenHome(
     viewModel: HomeVM = viewModel(),
     onProductClick: (ProductDto) -> Unit = {},
+    listState: LazyGridState
 ) {
     var showSearchSheet by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -123,6 +126,7 @@ fun ScreenHome(
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
+                state = listState,
                 contentPadding = PaddingValues(horizontal = 10.dp),
                 modifier = Modifier.fillMaxSize(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

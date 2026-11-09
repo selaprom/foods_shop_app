@@ -21,6 +21,10 @@ class LoginVM @Inject constructor(
     private val _loginUiState = MutableStateFlow<BaseUiState<LoginResponse>>(BaseUiState.None)
     val loginUiState = _loginUiState.asStateFlow()
 
+    fun resetState() {
+        _loginUiState.value = BaseUiState.None   // use your real state name
+    }
+
 
     fun login(email: String, password: String) {
         viewModelScope.launch {

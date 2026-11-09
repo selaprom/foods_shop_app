@@ -127,8 +127,9 @@ fun LoginScreen(
 
     val isFormValid = isEmail(email) && password.length >= 4
 
-    LaunchedEffect(loginUiState) {
+    var hasNavigated by remember { mutableStateOf(false) }
 
+    LaunchedEffect(loginUiState) {
         when (val state = loginUiState) {
             is BaseUiState.Loading -> {
                 isLoading = true
@@ -136,21 +137,24 @@ fun LoginScreen(
 
             is BaseUiState.Success -> {
                 isLoading = false
-                onForward(state.data.user.id)
 
+                if (!hasNavigated) {
+                    hasNavigated = true
+                    loginVM.resetState()
+                    onForward(state.data.user.id)
+
+                }
             }
-            is BaseUiState.Error -> {
-                isError = true
-                isLoading = false
 
+            is BaseUiState.Error -> {
+                isLoading = false
+                isError = true
             }
 
             else -> {
                 isLoading = false
-
             }
         }
-
     }
 
 
@@ -319,6 +323,7 @@ fun LoginScreen(
                             .fillMaxWidth(),
                         onClick = {
                             loginVM.login(email, password)
+                            hasNavigated = false
                         },
                     ) {
                         Text("Login", fontSize = 20.sp, fontWeight = FontWeight.Bold)

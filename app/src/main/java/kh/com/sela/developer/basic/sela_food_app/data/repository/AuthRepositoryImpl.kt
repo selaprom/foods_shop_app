@@ -1,5 +1,6 @@
 package kh.com.sela.developer.basic.sela_food_app.data.repository
 
+import android.util.Log
 import kh.com.sela.developer.basic.sela_food_app.data.local.TokenStore
 import kh.com.sela.developer.basic.sela_food_app.data.remote.api.AuthApiService
 import kh.com.sela.developer.basic.sela_food_app.domain.model.request.LoginRequest
@@ -12,11 +13,15 @@ import retrofit2.Response
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(private val authApiService: AuthApiService,private val tokenStore: TokenStore) : AuthRepository {
+
+
     override suspend fun login(loginRequest: LoginRequest): Response<LoginResponse> {
        val response = authApiService.login(loginRequest)
         if (response.isSuccessful){
             var result = response.body()?: throw Exception("Response body is null")
             tokenStore.token = result.token
+
+            Log.d("Auth", "token save: ${!tokenStore.token.isNullOrEmpty()}")
 
         return response
         }
@@ -29,9 +34,25 @@ class AuthRepositoryImpl @Inject constructor(private val authApiService: AuthApi
 
     }
 
+
     override suspend fun logout(): Response<LogoutResponse> {
-        return authApiService.logout()
+        return try {
+            val response = authApiService.logout()
+
+
+            Log.d("Logout", "Status: ${response.code()}")
+            Log.d("Logout", "Success: ${response.isSuccessful}")
+
+            response
+        } catch (e: Exception) {
+            Log.e("Logout", "Error: ${e.message}", e)
+            throw e
+        } finally {
+            tokenStore.clear()
+
+        }
     }
+
 
     override suspend fun register(registerRequest: RegisterRequest): Response<RegisterResponse> {
         return authApiService.register(registerRequest)

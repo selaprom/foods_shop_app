@@ -1,5 +1,10 @@
 package kh.com.sela.developer.basic.sela_food_app.presentation.main_screen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -10,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
@@ -36,6 +43,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kh.com.sela.developer.basic.sela_food_app.Util.rememberBottomBarVisibility
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ProductDto
 import kh.com.sela.developer.basic.sela_food_app.presentation.components.BottomNavigationBar
 import kh.com.sela.developer.basic.sela_food_app.presentation.favorit_screen.ScreenFavorite
@@ -49,9 +57,16 @@ import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 fun MainScreen(
     onClicktoCart: () -> Unit,
     onSearchClick: () -> Unit,
-    onProductClick: (ProductDto) -> Unit
+    onProductClick: (ProductDto) -> Unit,
+    onLogout: () -> Unit
 ) {
     var itemselected by rememberSaveable { mutableStateOf<String>("Home") }
+
+    val listState = rememberLazyGridState()
+
+    val bottomBarVisible by rememberBottomBarVisibility(
+        listState = listState
+    )
 
 
 
@@ -103,12 +118,24 @@ fun MainScreen(
             )
         },
         bottomBar = {
-            BottomNavigationBar(
-                onselectedRoute = itemselected,
-                onItemClick = { item ->
-                    itemselected = item
-                }
-            )
+
+            AnimatedVisibility(
+                visible = bottomBarVisible,
+                enter = slideInVertically {
+                    it
+                } + fadeIn(),
+                exit = slideOutVertically {
+                    it
+                } + fadeOut()
+            ) {
+                BottomNavigationBar(
+                    onselectedRoute = itemselected,
+                    onItemClick = { item ->
+                        itemselected = item
+                    }
+                )
+            }
+
         }
     ) { paddingValues ->
         Box(
@@ -123,12 +150,15 @@ fun MainScreen(
                     onProductClick = { product ->
                         onProductClick(product)
                     },
+                    listState = listState
 
                 )
 
                 "Favorite" -> ScreenFavorite()
                 "Order" -> ScreenOrder()
-                "Account" -> ScreenProfile()
+                "Account" -> ScreenProfile(
+                    onLogout = onLogout
+                )
             }
 
         }

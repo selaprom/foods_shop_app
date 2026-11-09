@@ -1,5 +1,6 @@
 package kh.com.sela.developer.basic.sela_food_app.navigation
 
+import android.util.Log
 import android.view.FrameMetrics.ANIMATION_DURATION
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
@@ -36,20 +37,22 @@ fun AppNavigation(
 
 
     LaunchedEffect(startDestination) {
+        Log.d("NAV_DEBUG", "Start destination changed: $startDestination")
+
         val destination = when (startDestination) {
-
             AppStartDestination.Loading -> null
-
             AppStartDestination.Welcome -> WelcomeRoute
-
             AppStartDestination.Login -> LoginRoute
-
             AppStartDestination.Main -> MainScreenRoute
         }
 
         if (destination != null) {
+            Log.d("NAV_DEBUG", "Applying destination: $destination")
+
             backStack.clear()
             backStack.add(destination)
+
+            Log.d("NAV_DEBUG", "BackStack after startup: $backStack")
         }
     }
 
@@ -79,10 +82,10 @@ fun AppNavigation(
             )
         },
         entryProvider = entryProvider {
-            entry <SplashRoute>{
+            entry<SplashRoute> {
                 SplashScreen(
                     onFinished = {
-                        backStack.add(WelcomeRoute)
+                        Log.d("NAV_DEBUG", "Splash finished")
                     }
                 )
             }
@@ -105,8 +108,12 @@ fun AppNavigation(
                     onClicktoSignup = {
                         backStack.add(SignupRoute)
                     },
-                    onForward = {userId->
+                    onForward = { userId ->
+                        Log.d("NAV_DEBUG", "Login success: $userId")
+
                         backStack.add(MainScreenRoute)
+
+                        Log.d("NAV_DEBUG", "BackStack after login: $backStack")
                     }
                 )
             }
@@ -128,6 +135,14 @@ fun AppNavigation(
                     },
                     onProductClick = {product->
                         backStack.add(ProductDetails(product))
+                    },
+                    onLogout = {
+                        Log.d("NAVIGATION", "Logout navigation triggered")
+
+                        backStack.clear()
+                        backStack.add(LoginRoute)
+
+                        Log.d("NAVIGATION", "BackStack: $backStack")
                     }
                 )
             }
