@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kh.com.sela.developer.basic.sela_food_app.Util.rememberBottomBarVisibility
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ProductDto
+import kh.com.sela.developer.basic.sela_food_app.presentation.cart_screen.ScreenCart
 import kh.com.sela.developer.basic.sela_food_app.presentation.components.BottomNavigationBar
 import kh.com.sela.developer.basic.sela_food_app.presentation.favorit_screen.ScreenFavorite
 import kh.com.sela.developer.basic.sela_food_app.presentation.home_screen.ScreenHome
@@ -105,15 +106,18 @@ fun MainScreen(
                             contentDescription = "Notifications"
                         )
                     }
-
                     IconButton(
-                        onClick = onClicktoCart
+                        onClick = {
+                            onClicktoCart()
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = "Cart"
+                            contentDescription = "Notifications"
                         )
                     }
+
+
                 }
             )
         },
@@ -156,6 +160,7 @@ fun MainScreen(
 
                 "Favorite" -> ScreenFavorite()
                 "Order" -> ScreenOrder()
+
                 "Account" -> ScreenProfile(
                     onLogout = onLogout
                 )

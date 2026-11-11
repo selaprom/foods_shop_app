@@ -1,5 +1,9 @@
 package kh.com.sela.developer.basic.sela_food_app.presentation.product_detail_screen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,11 +27,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,6 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -63,26 +71,36 @@ fun ScreenProductDetails(
     viewModel: ProductDetailVM = hiltViewModel(),
 
 ) {
+    var isLoading by remember { mutableStateOf(false) }
     var isFavorit by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
-    var numberOrder by remember { mutableStateOf(1) }
+    val quantity by viewModel.quantity.collectAsState()
     val addToCartState by viewModel.addToCartState.collectAsState()
     LaunchedEffect(addToCartState) {
         when (val state = addToCartState)  {
             is BaseUiState.Success -> {
 
-                println("==========> Add to cart  Success")
+                isLoading = false
+
+                onBack()
+                viewModel.resetState()
+
             }
             is BaseUiState.Error -> {
                 println("==========> Add to cart  Error ${state.message}")
             }
             is BaseUiState.Loading -> {}
             else -> {
-                viewModel.resetState()
+              //  viewModel.resetState()
             }
 
         }
 
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.resetQuantity()
+        }
     }
     Box(
         modifier = Modifier
@@ -176,9 +194,10 @@ fun ScreenProductDetails(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Text("Total Price")
+                        val totalPrice = (product?.price?.toDoubleOrNull() ?: 1.0) * quantity
+                        Text("Total Price", style = MaterialTheme.typography.titleMedium, fontSize = 20.sp)
                         Text(
-                            "\$${product?.price}",
+                            text = String.format("%.2f", totalPrice),
                             fontWeight = FontWeight.Bold,
                             fontSize = 25.sp,
                             color = Color.Black
@@ -189,7 +208,8 @@ fun ScreenProductDetails(
                         horizontalAlignment = Alignment.Start,
                         verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Text("Size")
+                        Text("Quantity", style = MaterialTheme.typography.titleMedium, fontSize = 20.sp)
+
                         Row(
                             modifier = Modifier,
                             verticalAlignment = Alignment.CenterVertically,
@@ -197,7 +217,7 @@ fun ScreenProductDetails(
                         ) {
                             CircleIconButton(
                                 onClick = {
-                                    if (numberOrder > 1) numberOrder = numberOrder - 1
+                                    viewModel.decreaseQuantity()
 
                                 },
                                 icon = R.drawable.ic_minuse,
@@ -205,14 +225,14 @@ fun ScreenProductDetails(
 
                                 )
                             Text(
-                                "$numberOrder",
+                                "$quantity",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 25.sp,
                                 color = Color.Black
                             )
                             CircleIconButton(
                                 onClick = {
-                                    numberOrder = numberOrder + 1
+                                    viewModel.increaseQuantity()
                                 },
                                 icon = R.drawable.ic_add,
                                 modifier = Modifier,
@@ -245,7 +265,11 @@ fun ScreenProductDetails(
                 .align(Alignment.TopCenter)
         ) {
             CircleIconButton(
-                onClick = onBack,
+                onClick = {
+
+                    onBack()
+
+                },
                 icon = R.drawable.ic_back,
                 modifier = Modifier.align(Alignment.CenterStart),
                 color = OldGreen
@@ -254,13 +278,14 @@ fun ScreenProductDetails(
 
 
         }
-        //button buynow
+        //button add to cart
         Row(
             modifier = Modifier
                 .height(95.dp)
                 .clickable(onClick = {
                     println("==========> Add to cart")
-                    viewModel.addToCart(product!!.id, numberOrder)
+                    viewModel.addToCart(product!!.id, quantity)
+                    isLoading = true
                 })
                 .padding(bottom = 30.dp, start = 12.dp, end = 12.dp)
                 .align(Alignment.BottomCenter)
@@ -306,6 +331,48 @@ fun ScreenProductDetails(
                 modifier = Modifier.size(30.dp),
                 tint = Color.White
             )
+        }
+    }
+    if (isLoading) {
+        Dialog(
+            onDismissRequest = {}
+        ) {
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn(tween(300)) +
+                        scaleIn(
+                            initialScale = 0.85f,
+                            animationSpec = tween(300)
+                        )
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = Color.White
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Loading",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                        CircularProgressIndicator(
+                            color = OldGreen,
+                            strokeWidth = 4.dp
+                        )
+
+                        Text(
+                            text = "Please wait...",
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
         }
     }
 }

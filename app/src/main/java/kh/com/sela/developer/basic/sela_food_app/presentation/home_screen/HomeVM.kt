@@ -39,6 +39,8 @@ class HomeVM @Inject constructor(
     private val _listOfselectProduct = MutableStateFlow<Set<Int>>(emptySet())
 
     val listOfselectProduct = _listOfselectProduct.asStateFlow()
+
+
     fun setListOfselectProduct(productId: Int) {
         _listOfselectProduct.update { current ->
             if (productId in current) current - productId else current + productId

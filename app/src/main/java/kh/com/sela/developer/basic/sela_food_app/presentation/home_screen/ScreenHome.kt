@@ -1,5 +1,6 @@
 package kh.com.sela.developer.basic.sela_food_app.presentation.home_screen
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +38,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -78,16 +80,15 @@ fun ScreenHome(
     val productUiState = viewModel.productUiState.collectAsState()
 
     var selectFavorit = viewModel.listOfselectProduct.collectAsState()
-    LaunchedEffect(Unit) {
+
+    LaunchedEffect(productUiState, key2 = selectFavorit) {
         viewModel.loadFavorites(1)
-        println("load favorite===========>${viewModel.listOfselectProduct.value}")
-
-
-    }
-    LaunchedEffect(Unit) {
         viewModel.getProducts()
+        Log.d("HOME", "getProducts called", Throwable())
 
     }
+
+
 
 
 
@@ -209,6 +210,8 @@ fun ScreenHome(
                     ItemCard(
                         product = filteredProducts[it],
                         onProductClick = {
+
+
                             onProductClick(it)
                         },
                         onClikFavorite = {productId->

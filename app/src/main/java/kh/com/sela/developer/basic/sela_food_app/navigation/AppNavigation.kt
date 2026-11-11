@@ -134,6 +134,7 @@ fun AppNavigation(
                         //
                     },
                     onProductClick = {product->
+
                         backStack.add(ProductDetails(product))
                     },
                     onLogout = {
@@ -156,6 +157,7 @@ fun AppNavigation(
             entry<ProductDetails> {
                 ScreenProductDetails(
                     onBack = {
+
                         backStack.removeLastOrNull()
                     },
                     product = it.product,
