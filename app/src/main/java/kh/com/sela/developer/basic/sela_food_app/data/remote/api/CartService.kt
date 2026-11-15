@@ -15,6 +15,6 @@ interface CartService{
     suspend fun addToCart(@Body request: AddToCartParams): Response<CartItemResponse>
 
     @GET("cart")
-    suspend fun getCartItems(): Response<CartResponse<List<CartItemDto>>>
+    suspend fun getCartItems(): Response<CartResponse>
 
 }

@@ -23,7 +23,7 @@ class CartRepositoryImpl @Inject constructor(
         throw Exception("Failed to add item to cart")
     }
 
-    override suspend fun getCartItems(): Response<CartResponse<List<CartItemDto>>> {
+    override suspend fun getCartItems(): Response<CartResponse> {
         val response = cartService.getCartItems()
         if (response.isSuccessful) {
             return response

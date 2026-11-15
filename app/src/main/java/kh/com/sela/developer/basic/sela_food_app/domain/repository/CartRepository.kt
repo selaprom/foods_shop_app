@@ -8,6 +8,6 @@ import retrofit2.Response
 
 interface CartRepository {
     suspend fun addToCart(addToCartParams: AddToCartParams): Response<CartItemResponse>
-    suspend fun getCartItems(): Response<CartResponse<List<CartItemDto>>>
+    suspend fun getCartItems(): Response<CartResponse>
 
 }

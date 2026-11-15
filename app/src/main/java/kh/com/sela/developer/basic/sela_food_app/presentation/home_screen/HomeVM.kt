@@ -64,8 +64,12 @@ class HomeVM @Inject constructor(
     fun toggleSelecteFavoriteProduct(userId: Int, productId: Int) {
         viewModelScope.launch {
             val params = DeleteFavoriteParams(userId, productId)
+            val old = _listOfselectProduct.value
             toggleFavoriteProductUseCase(params).collect {
                 _toggleFavoriteProduct.value = it
+                if (it is BaseUiState.Error) {
+                    _listOfselectProduct.value = old
+                }
             }
 
 

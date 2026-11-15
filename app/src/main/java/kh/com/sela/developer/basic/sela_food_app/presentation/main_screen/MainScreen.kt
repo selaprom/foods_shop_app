@@ -6,7 +6,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,9 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
@@ -41,8 +45,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kh.com.sela.developer.basic.sela_food_app.R
 import kh.com.sela.developer.basic.sela_food_app.Util.rememberBottomBarVisibility
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ProductDto
 import kh.com.sela.developer.basic.sela_food_app.presentation.cart_screen.ScreenCart
@@ -91,11 +98,34 @@ fun MainScreen(
                     titleContentColor = Color.White
                 ),
                 title = {
-                    Text(
-                        text = "Main Screen",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            modifier = Modifier,
+                            shape = CircleShape,
+                            color = Color.White,
+
+
+                        ) {
+                            Icon(
+                                modifier = Modifier.padding(8.dp).size(24.dp),
+
+                                painter = painterResource(id = R.drawable.ic_person), contentDescription = null)
+                        }
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(-5.dp)
+                        ) {
+                            Text("hello", fontSize = 17.sp)
+                            Text(
+                                text = "Dara",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.SemiBold
+                            )
+
+                        }
+                    }
                 },
                 actions = {
                     IconButton(

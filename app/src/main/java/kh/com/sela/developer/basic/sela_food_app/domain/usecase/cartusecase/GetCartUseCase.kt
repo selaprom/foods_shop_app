@@ -11,10 +11,11 @@ import javax.inject.Inject
 
 class GetCartUseCase @Inject constructor(
     private val cartRepository: CartRepository
-) : BaseUseCase<Unit, Flow<BaseUiState<CartResponse<List<CartItemDto>>>>>() {
-    override suspend fun execute(param: Unit): Flow<BaseUiState<CartResponse<List<CartItemDto>>>> {
+) : BaseUseCase<Unit, Flow<BaseUiState<CartResponse>>>() {
+    override suspend fun execute(param: Unit): Flow<BaseUiState<CartResponse>> {
         return flow {
             try {
+
                 emit(BaseUiState.Loading)
                 val response = cartRepository.getCartItems()
                 if (response.isSuccessful) {

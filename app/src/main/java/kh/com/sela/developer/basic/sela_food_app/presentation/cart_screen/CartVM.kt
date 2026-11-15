@@ -18,11 +18,12 @@ class CartVM @Inject constructor(
 ) : ViewModel() {
 
     private val _cartState =
-        MutableStateFlow<BaseUiState<CartResponse<List<CartItemDto>>>>(BaseUiState.None)
+        MutableStateFlow<BaseUiState<CartResponse>>(BaseUiState.None)
 
     val cartState = _cartState.asStateFlow()
     suspend fun getCartItems() {
         getCartUseCase.invoke(Unit).collect {
+
             _cartState.value = it
 
         }
