@@ -4,7 +4,10 @@
 An Android food ordering application that allows users to browse food products, manage favorites, add products to cart, and manage their accounts.
 
 ## Screen Demo
-![Screen_Demo](screen_demo/cover portfolio)
+<p align="center">
+  <img src="screen_demo/cover portfolio.jpg" width="1000"/>
+ 
+</p>
 
 
 ## Features
