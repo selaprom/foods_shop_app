@@ -1,6 +1,7 @@
 package kh.com.sela.developer.basic.sela_food_app.presentation.cart_screen
 
 import android.R.style.Theme
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -75,53 +76,38 @@ import coil3.compose.AsyncImage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kh.com.sela.developer.basic.sela_food_app.R
 import kh.com.sela.developer.basic.sela_food_app.data.base.BaseUiState
+import kh.com.sela.developer.basic.sela_food_app.domain.model.response.CartItem
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.CartItemDto
+import kh.com.sela.developer.basic.sela_food_app.domain.model.response.toDomain
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.BackGroundCard
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 
 @Composable
 fun ScreenCart(
     onBack: () -> Unit,
-    cartVM: CartVM= hiltViewModel()
+    cartVM: CartViewModel = hiltViewModel()
 ) {
-    val cartItemUiState by cartVM.cartState.collectAsStateWithLifecycle()
+    val state by cartVM.state.collectAsStateWithLifecycle()
     var isLoding by remember { mutableStateOf(false) }
+    val uiState by cartVM.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        val result= cartVM.getCartItems()
 
-    }
-
-    when (val state = cartItemUiState) {
+    when (val state = state) {
         is BaseUiState.Loading -> {
-            print("=========>Loading")
-
             isLoding = true
-
         }
         is BaseUiState.Success -> {
-            print("=========>Success")
-
             isLoding = false
-
-
-
-    }
-        is BaseUiState.Error -> {
-            print("=========>Error")
-
-            isLoding = false
-
+            val items = state.data.data.map { it.toDomain() }
+            cartVM.setItems(items)   // push the list into the ViewModel
         }
 
-        else -> {
-
-        }
+        else -> Unit
     }
 
-    when(val state = cartItemUiState){
+    when( state){
         is BaseUiState.Success -> {
-            val cartItems = state.data.data
+            val cartItems = uiState.items
 
 
             Box(
@@ -292,7 +278,7 @@ fun ScreenCart(
 
 @Composable
 fun ItemCart(
-    itemCart: CartItemDto,
+    itemCart: CartItem,
 ){
     Surface(
         modifier = Modifier.height(107.dp).padding(horizontal = 10.dp), shape = RoundedCornerShape(16.dp),
@@ -323,10 +309,10 @@ fun ItemCart(
                 verticalArrangement = Arrangement.SpaceBetween){
                 Text(itemCart.name, fontWeight = FontWeight.Bold, fontSize = 17.sp)
                 Text(
-                    text = itemCart.category?.name ?: "",
+                    text = itemCart.category,
                     fontSize = 15.sp
                 )
-                Text("${itemCart.description}", fontSize = 15.sp)
+                Text(itemCart.description, fontSize = 15.sp)
 
 
             }
@@ -347,7 +333,9 @@ fun ItemCart(
                     verticalAlignment = Alignment.CenterVertically
                 ){
                     Surface(
-                        modifier = Modifier.size(30.dp).padding(all = 5.dp),
+                        modifier = Modifier.size(30.dp)
+                            .clickable {  }
+                            .padding(all = 5.dp),
                         shape = CircleShape,
                     ) {
                         Icon(painter = painterResource(R.drawable.ic_minuse), contentDescription = null)
@@ -358,7 +346,10 @@ fun ItemCart(
                     Text("${itemCart.quantity}", fontSize = 18.sp,color = Color.Black)
                     Spacer(modifier = Modifier.width(5.dp))
                     Surface(
-                        modifier = Modifier.size(30.dp).padding(all = 5.dp),
+                        modifier = Modifier
+                            .clickable{}
+                            .size(30.dp)
+                            .padding(all = 5.dp),
                         shape = CircleShape,
                     ) {
                         Icon(painter = painterResource(R.drawable.ic_add), contentDescription = null)
@@ -366,7 +357,7 @@ fun ItemCart(
                     }
 
                 }
-                Text("$${"%.2f".format(itemCart.unitPrice)}",fontSize = 19.sp,fontWeight = FontWeight.Bold,color = Color.Black)
+                Text("$${"%.2f".format(itemCart.total)}",fontSize = 19.sp,fontWeight = FontWeight.Bold,color = Color.Black)
             }
 
         }
