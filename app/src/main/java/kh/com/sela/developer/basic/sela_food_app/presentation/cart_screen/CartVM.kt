@@ -16,7 +16,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlin.coroutines.cancellation.CancellationException
+
 
 //
 //@HiltViewModel
@@ -40,7 +42,9 @@ import kotlin.coroutines.cancellation.CancellationException
 
 data class CartUiState(
     val items: List<CartItem> = emptyList(),
-    val deliveryFee: Double = 1.5,
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val deliveryFee: Double = 1.5
 
 ) {
     val subtotal: Double get() = items.sumOf { it.total }
@@ -55,8 +59,6 @@ sealed interface CartEvent {
 @HiltViewModel
 class CartViewModel @Inject constructor(private val getCartUseCase: GetCartUseCase) : ViewModel() {
 
-    private val _state = MutableStateFlow<BaseUiState<CartResponse>>(BaseUiState.None)
-    val state = _state.asStateFlow()
 
     private val _uiState = MutableStateFlow(CartUiState())
     val uiState = _uiState.asStateFlow()
@@ -65,14 +67,36 @@ class CartViewModel @Inject constructor(private val getCartUseCase: GetCartUseCa
     private val _events = Channel<CartEvent>(Channel.BUFFERED)
     val events = _events.receiveAsFlow()
 
-    fun setItems(items: List<CartItem>) = _uiState.update { it.copy(items = items) }
 
-    init { load() }
+//    init {
+//        load()
+//    }
 
     fun load() {
         viewModelScope.launch {
             getCartUseCase(Unit).collect { result ->
-                _state.value = result
+                when (result) {
+                    is BaseUiState.Loading -> {
+                        _uiState.update { it.copy(isLoading = true,error = null) }
+
+                    }
+
+                    is BaseUiState.Success -> {
+                        _uiState.update {
+                            it.copy(
+                                items = result.data.data.map { it.toDomain() },
+                                isLoading = false,
+                                error = null
+                            )
+                        }
+                    }
+
+                    is BaseUiState.Error -> {
+                        _uiState.update { it.copy(isLoading = false, error = result.message) }
+
+                    }
+                    else -> Unit
+                }
             }
         }
     }

@@ -91,7 +91,7 @@ import kh.com.sela.developer.basic.sela_food_app.ui.theme.OrangeColor
 fun LoginScreen(
     onForward: (userIdi: Int) -> Unit = {},
     onClicktoSignup: () -> Unit = {},
-    loginVM: LoginVM = viewModel()
+    loginVM: LoginVM = viewModel(),
 ) {
     var email by remember { mutableStateOf("") }
     var emailError by remember { mutableStateOf("") }

@@ -87,29 +87,27 @@ fun ScreenCart(
     onBack: () -> Unit,
     cartVM: CartViewModel = hiltViewModel()
 ) {
-    val state by cartVM.state.collectAsStateWithLifecycle()
     var isLoding by remember { mutableStateOf(false) }
     val uiState by cartVM.uiState.collectAsStateWithLifecycle()
-
-
-    when (val state = state) {
-        is BaseUiState.Loading -> {
-            isLoding = true
-        }
-        is BaseUiState.Success -> {
-            isLoding = false
-            val items = state.data.data.map { it.toDomain() }
-            cartVM.setItems(items)   // push the list into the ViewModel
-        }
-
-        else -> Unit
+    LaunchedEffect(Unit) {
+        cartVM.load()
     }
 
-    when( state){
-        is BaseUiState.Success -> {
+
+    when {
+        uiState.isLoading && uiState.items.isEmpty() -> {
+            isLoding = true
+
+        }
+        uiState.error != null && uiState.items.isEmpty()  -> {
+            isLoding = false
+        }
+        uiState.items.isEmpty() -> {
+            isLoding = false
+        }
+        else -> {
+            isLoding = false
             val cartItems = uiState.items
-
-
             Box(
                 modifier = Modifier
                     .background(BackGroundCard)
@@ -161,7 +159,9 @@ fun ScreenCart(
                             items = cartItems,
                             key = { it.id }
                         ) { itemCart ->
-                            ItemCart(itemCart)
+                            ItemCart(itemCart,
+                                onIncrease = {id-> cartVM.increase(id)},
+                                onDecrease = {id->cartVM.decrease(id)})
                         }
                     }
                 }
@@ -189,7 +189,7 @@ fun ScreenCart(
 
                         ) {
                             Text("Sub Total")
-                            Text("$24.00",fontWeight = FontWeight.Bold,fontSize = 20.sp)
+                            Text(text = String.format("%.2f", uiState.subtotal),fontWeight = FontWeight.Bold,fontSize = 20.sp)
                         }
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -198,7 +198,7 @@ fun ScreenCart(
 
                         ) {
                             Text("Delivery Fee")
-                            Text("$2.00",fontWeight = FontWeight.Bold,fontSize = 20.sp)
+                            Text("${uiState.deliveryFee}",fontWeight = FontWeight.Bold,fontSize = 20.sp)
                         }
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 16.dp),
@@ -211,7 +211,7 @@ fun ScreenCart(
 
                         ) {
                             Text("Total",fontWeight = FontWeight.Bold,fontSize = 25.sp)
-                            Text("$26.00",fontWeight = FontWeight.Bold,fontSize = 25.sp)
+                            Text(text = String.format("%.2f", uiState.grandTotal),fontWeight = FontWeight.Bold,fontSize = 25.sp)
                         }
                         Spacer(modifier = Modifier.height(5.dp))
                         FilledTonalButton(
@@ -227,8 +227,12 @@ fun ScreenCart(
                     }
                 }
 
+
             }
-        }else -> {}
+
+
+
+        }
     }
     if (isLoding) {
         Dialog(
@@ -273,12 +277,16 @@ fun ScreenCart(
         }
     }
 
+
+
 }
 
 
 @Composable
 fun ItemCart(
     itemCart: CartItem,
+    onIncrease: (Int) -> Unit,
+    onDecrease: (Int) -> Unit,
 ){
     Surface(
         modifier = Modifier.height(107.dp).padding(horizontal = 10.dp), shape = RoundedCornerShape(16.dp),
@@ -334,7 +342,9 @@ fun ItemCart(
                 ){
                     Surface(
                         modifier = Modifier.size(30.dp)
-                            .clickable {  }
+                            .clickable {
+                                onDecrease(itemCart.id)
+                            }
                             .padding(all = 5.dp),
                         shape = CircleShape,
                     ) {
@@ -347,7 +357,9 @@ fun ItemCart(
                     Spacer(modifier = Modifier.width(5.dp))
                     Surface(
                         modifier = Modifier
-                            .clickable{}
+                            .clickable{
+                                onIncrease(itemCart.id)
+                            }
                             .size(30.dp)
                             .padding(all = 5.dp),
                         shape = CircleShape,

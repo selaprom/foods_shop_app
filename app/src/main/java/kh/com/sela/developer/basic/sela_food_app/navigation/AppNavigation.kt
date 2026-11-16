@@ -144,9 +144,15 @@ fun AppNavigation(
                         backStack.add(LoginRoute)
 
                         Log.d("NAVIGATION", "BackStack: $backStack")
-                    }
+                    },
+
                 )
-            }
+
+
+
+
+
+        }
             entry<ScreenCartRoute> {
                 ScreenCart(
                     onBack = {
@@ -163,11 +169,5 @@ fun AppNavigation(
                     product = it.product,
                 )
             }
-            entry<AppNavigation> {
-                AppNavigationScreen()
-            }
-
-
-        }
-    )
+    })
 }

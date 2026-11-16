@@ -66,7 +66,8 @@ fun MainScreen(
     onClicktoCart: () -> Unit,
     onSearchClick: () -> Unit,
     onProductClick: (ProductDto) -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+
 ) {
     var itemselected by rememberSaveable { mutableStateOf<String>("Home") }
 
