@@ -77,9 +77,9 @@ class HomeVM @Inject constructor(
         }
     }
 
-    fun loadFavorites(userId: Int) {
+    fun loadFavorites() {
         viewModelScope.launch {
-            getFavoritesUseCase(userId).collect { state ->
+            getFavoritesUseCase(Unit).collect { state ->
                 when (state) {
                     is BaseUiState.Success -> {
                         println("data=========>from viewmodel ${state.data.data}")

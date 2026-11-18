@@ -83,13 +83,14 @@ import coil3.compose.AsyncImage
 import kh.com.sela.developer.basic.sela_food_app.R
 
 import kh.com.sela.developer.basic.sela_food_app.data.base.BaseUiState
+import kh.com.sela.developer.basic.sela_food_app.domain.model.response.AuthUser
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OrangeColor
 
 @Preview(showBackground = true)
 @Composable
 fun LoginScreen(
-    onForward: (userIdi: Int) -> Unit = {},
+    onForward: (user: AuthUser) -> Unit = {},
     onClicktoSignup: () -> Unit = {},
     loginVM: LoginVM = viewModel(),
 ) {
@@ -141,7 +142,7 @@ fun LoginScreen(
                 if (!hasNavigated) {
                     hasNavigated = true
                     loginVM.resetState()
-                    onForward(state.data.user.id)
+                    onForward(state.data.user)
 
                 }
             }

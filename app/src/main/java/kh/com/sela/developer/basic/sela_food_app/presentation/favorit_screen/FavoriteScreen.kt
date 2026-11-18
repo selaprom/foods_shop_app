@@ -56,13 +56,13 @@ fun ScreenFavorite(
 
 
     LaunchedEffect(Unit) {
-        viewModel.getFavorites(1)
+        viewModel.getFavorites()
     }
 
     LaunchedEffect(Unit) {
         when (val state = deleteFavoritUrState) {
             is BaseUiState.Success -> {
-                viewModel.getFavorites(1)
+                viewModel.getFavorites()
 
 
             }

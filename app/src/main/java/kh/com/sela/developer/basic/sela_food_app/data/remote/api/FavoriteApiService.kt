@@ -16,9 +16,8 @@ interface FavoriteApiService {
 
 
     @GET("favorites")
-    suspend fun getFavorites(
-        @Query("user_id") userId: Int
-    ): Response<FavoriteResponse>
+    suspend fun getFavorites(): Response<FavoriteResponse>
+
 
     @POST("favorites")
     suspend fun createFavorite(

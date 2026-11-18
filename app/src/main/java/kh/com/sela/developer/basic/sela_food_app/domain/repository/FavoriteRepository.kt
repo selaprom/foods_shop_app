@@ -7,7 +7,7 @@ import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ToggleFav
 import retrofit2.Response
 
 interface FavoriteRepository {
-    suspend fun getFavorites(userId: Int): Response<FavoriteResponse>
+    suspend fun getFavorites(): Response<FavoriteResponse>
     suspend fun createFavorite(userId: Int, productId: Int): Response<Unit>
     suspend fun toggleFavorite(userIdProducId: DeleteFavoriteParams): Response<ToggleFavoriteResponse>
 }

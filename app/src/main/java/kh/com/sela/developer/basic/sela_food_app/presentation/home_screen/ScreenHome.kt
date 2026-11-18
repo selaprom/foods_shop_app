@@ -82,7 +82,7 @@ fun ScreenHome(
     var selectFavorit = viewModel.listOfselectProduct.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadFavorites(1)
+        viewModel.loadFavorites()
         viewModel.getProducts()
         Log.d("HOME", "getProducts called", Throwable())
 

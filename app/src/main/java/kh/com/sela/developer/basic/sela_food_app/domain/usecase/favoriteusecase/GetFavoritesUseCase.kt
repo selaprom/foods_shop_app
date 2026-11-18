@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class GetFavoritesUseCase @Inject constructor(private val favoriteRepository: FavoriteRepository) :
-        BaseUseCase<Int, Flow<BaseUiState<FavoriteResponse>>>() {
-            override suspend fun execute(param: Int): Flow<BaseUiState<FavoriteResponse>> {
+        BaseUseCase<Unit, Flow<BaseUiState<FavoriteResponse>>>() {
+            override suspend fun execute(param: Unit): Flow<BaseUiState<FavoriteResponse>> {
                 return flow {
 
                     try {
                         emit(BaseUiState.Loading)
-                        val response = favoriteRepository.getFavorites(param)
+                        val response = favoriteRepository.getFavorites()
                         if (response.isSuccessful) {
                             response.body()?.let { data ->
                                 emit(BaseUiState.Success(data))

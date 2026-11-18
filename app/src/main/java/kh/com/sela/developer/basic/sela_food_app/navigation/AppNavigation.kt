@@ -108,8 +108,8 @@ fun AppNavigation(
                     onClicktoSignup = {
                         backStack.add(SignupRoute)
                     },
-                    onForward = { userId ->
-                        Log.d("NAV_DEBUG", "Login success: $userId")
+                    onForward = { user ->
+                        Log.d("NAV_DEBUG", "Login success: $user")
 
                         backStack.add(MainScreenRoute)
 

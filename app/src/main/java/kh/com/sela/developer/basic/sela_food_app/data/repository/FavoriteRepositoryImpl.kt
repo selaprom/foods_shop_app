@@ -11,8 +11,8 @@ import javax.inject.Inject
 
 class FavoriteRepositoryImpl @Inject constructor(private val favoriteApiService: FavoriteApiService) :
     FavoriteRepository {
-    override suspend fun getFavorites(userId: Int): Response<FavoriteResponse> {
-        val result = favoriteApiService.getFavorites(userId)
+    override suspend fun getFavorites(): Response<FavoriteResponse> {
+        val result = favoriteApiService.getFavorites()
         return result
         println("data=========>from repository $result")
     }

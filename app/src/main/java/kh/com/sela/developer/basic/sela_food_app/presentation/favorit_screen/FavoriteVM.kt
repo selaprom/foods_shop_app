@@ -39,9 +39,9 @@ class FavoriteVM @Inject constructor(private val favoritesUseCase: GetFavoritesU
         }
     }
 
-    fun getFavorites(userId: Int){
+    fun getFavorites(){
         viewModelScope.launch {
-            favoritesUseCase(userId).collect{state ->
+            favoritesUseCase(Unit).collect{ state ->
                 _favoriteUiState.value = state
                 when(state){
                     is BaseUiState.Success -> {
