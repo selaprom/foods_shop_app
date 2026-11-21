@@ -3,11 +3,16 @@ package kh.com.sela.developer.basic.sela_food_app.presentation.cart_screen
 import android.R.style.Theme
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,6 +36,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -46,16 +53,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.TopStart
@@ -64,12 +75,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.FixedScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -85,6 +100,8 @@ import kh.com.sela.developer.basic.sela_food_app.domain.model.response.CartItemD
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.toDomain
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.BackGroundCard
 import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @Composable
 fun ScreenCart(
@@ -283,7 +300,12 @@ fun ScreenCart(
                         ) { itemCart ->
                             ItemCart(itemCart,
                                 onIncrease = {id-> cartVM.increase(id)},
-                                onDecrease = {id->cartVM.decrease(id)})
+                                onDelete = {id->cartVM.remove(id)},
+                                onDecrease = {id->cartVM.decrease(id)}
+
+                            )
+
+
                         }
                     }
                 }
@@ -389,101 +411,169 @@ fun ScreenCart(
 
 }
 
+@Composable
+fun SwipeToRevealDelete(
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+    actionWidth: Dp = 80.dp,
+    content: @Composable () -> Unit
+) {
+    val actionWidthPx = with(LocalDensity.current) { actionWidth.toPx() }
+    val offsetX = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        // Delete button, only drawn while swiped
+        if (offsetX.value < 0f) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .padding(horizontal = 10.dp)
+                    .background(Color.Red, RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                IconButton(
+                    onClick = {
+                        onDelete()
+                        scope.launch { offsetX.snapTo(0f) }
+                    },
+                    modifier = Modifier
+                        .width(actionWidth)
+                        .fillMaxHeight()
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.White)
+                }
+            }
+        }
+
+        // Your card, draggable horizontally
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                .draggable(
+                    orientation = Orientation.Horizontal,
+                    state = rememberDraggableState { delta ->
+                        scope.launch {
+                            offsetX.snapTo((offsetX.value + delta).coerceIn(-actionWidthPx, 0f))
+                        }
+                    },
+                    onDragStopped = {
+                        val target = if (offsetX.value < -actionWidthPx / 2) -actionWidthPx else 0f
+                        offsetX.animateTo(target)
+                    }
+                )
+        ) {
+            content()
+        }
+    }
+}
 
 
-
-
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemCart(
     itemCart: CartItem,
     onIncrease: (Int) -> Unit,
     onDecrease: (Int) -> Unit,
-){
-    Surface(
-        modifier = Modifier.height(107.dp).padding(horizontal = 10.dp), shape = RoundedCornerShape(16.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(10.dp),
+    onDelete: (Int) -> Unit
 
-        )   {
-            AsyncImage(
-                model = itemCart.imageUrl,
-                contentDescription = "",
+) {
+
+
+    SwipeToRevealDelete(onDelete = { onDelete(itemCart.id) }) {
+        Surface(
+            modifier = Modifier.height(107.dp).padding(horizontal = 10.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Surface(
                 modifier = Modifier
-
-                    .height(100.dp).width(100.dp)
-                    .clip(shape = RoundedCornerShape(8.dp)),
-
-
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Crop,
-                alpha = 1.0f,
-                colorFilter = null,
-                filterQuality = FilterQuality.Medium
-
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Column(
-                modifier = Modifier.fillMaxHeight().padding(vertical = 4.dp),
-                verticalArrangement = Arrangement.SpaceBetween){
-                Text(itemCart.name, fontWeight = FontWeight.Bold, fontSize = 17.sp)
-                Text(
-                    text = itemCart.category,
-                    fontSize = 15.sp
-                )
-                Text(itemCart.description, fontSize = 15.sp)
-
-
-            }
-            Row(
-                modifier = Modifier.weight(1f)
-
-            ) { }
-            Column(
-                modifier = Modifier.fillMaxHeight().padding(vertical = 4.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.End
-                ){
+                    .height(107.dp)
+                    .padding(horizontal = 10.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
                 Row(
                     modifier = Modifier
-                        .height(35.dp)
-                        .background(color = MaterialTheme.colorScheme.secondary.copy(0.1f), shape = RoundedCornerShape(16.dp)),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    Surface(
-                        modifier = Modifier.size(30.dp)
-                            .clickable {
-                                onDecrease(itemCart.id)
-                            }
-                            .padding(all = 5.dp),
-                        shape = CircleShape,
-                    ) {
-                        Icon(painter = painterResource(R.drawable.ic_minuse), contentDescription = null)
-
-                    }
-                    Spacer(modifier = Modifier.width(5.dp))
-
-                    Text("${itemCart.quantity}", fontSize = 18.sp,color = Color.Black)
-                    Spacer(modifier = Modifier.width(5.dp))
-                    Surface(
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                ) {
+                    AsyncImage(
+                        model = itemCart.imageUrl,
+                        contentDescription = null,
                         modifier = Modifier
-                            .clickable{
-                                onIncrease(itemCart.id)
-                            }
-                            .size(30.dp)
-                            .padding(all = 5.dp),
-                        shape = CircleShape,
-                    ) {
-                        Icon(painter = painterResource(R.drawable.ic_add), contentDescription = null)
+                            .size(85.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
 
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .padding(vertical = 4.dp),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            itemCart.name,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 17.sp
+                        )
+
+                        Text(itemCart.category, fontSize = 15.sp)
+                        Text(itemCart.description, fontSize = 15.sp)
                     }
 
-                }
-                Text("$${"%.2f".format(itemCart.total)}",fontSize = 19.sp,fontWeight = FontWeight.Bold,color = Color.Black)
-            }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(vertical = 4.dp),
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .height(35.dp)
+                                .background(
+                                    MaterialTheme.colorScheme.secondary.copy(0.1f),
+                                    RoundedCornerShape(16.dp)
+                                ),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = { onDecrease(itemCart.id) }
+                            ) {
+                                Icon(
+                                    painterResource(R.drawable.ic_minuse),
+                                    contentDescription = "Decrease"
+                                )
+                            }
 
+                            Text("${itemCart.quantity}", fontSize = 18.sp)
+
+                            IconButton(
+                                onClick = { onIncrease(itemCart.id) }
+                            ) {
+                                Icon(
+                                    painterResource(R.drawable.ic_add),
+                                    contentDescription = "Increase"
+                                )
+                            }
+                        }
+
+                        Text(
+                            "$${"%.2f".format(itemCart.total)}",
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black
+                        )
+                    }
+                }
+            }
         }
     }
+
+
+
 }
+
