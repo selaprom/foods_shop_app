@@ -30,6 +30,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -42,8 +43,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButtonDefaults.colors
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -85,28 +89,146 @@ import kh.com.sela.developer.basic.sela_food_app.ui.theme.OldGreen
 @Composable
 fun ScreenCart(
     onBack: () -> Unit,
-    cartVM: CartViewModel = hiltViewModel()
+    cartVM: CartViewModel = hiltViewModel(),
+    onCheckoutSuccess: () -> Unit
 ) {
-    var isLoding by remember { mutableStateOf(false) }
     val uiState by cartVM.uiState.collectAsStateWithLifecycle()
+
+    val snackbar = remember { SnackbarHostState() }
+    var showConfirm by remember { mutableStateOf(false) }
+    var showSuccess by remember { mutableStateOf(false) }
+
+
+
     LaunchedEffect(Unit) {
         cartVM.load()
+
+    }
+    LaunchedEffect(Unit) {
+        cartVM.events.collect { event ->
+            when (event) {
+                CartEvent.CheckoutSuccess -> showSuccess = true
+                is CartEvent.ShowMessage -> snackbar.showSnackbar(event.msg)
+            }
+        }
     }
 
 
     when {
         uiState.isLoading && uiState.items.isEmpty() -> {
-            isLoding = true
+            Dialog(
+                onDismissRequest = {}
+            ) {
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(tween(300)) +
+                            scaleIn(
+                                initialScale = 0.85f,
+                                animationSpec = tween(300)
+                            )
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(20.dp),
+                        color = Color.White
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text(
+                                text = "Loading",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+
+                            CircularProgressIndicator(
+                                color = OldGreen,
+                                strokeWidth = 4.dp
+                            )
+
+                            Text(
+                                text = "Please wait...",
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+            }
 
         }
         uiState.error != null && uiState.items.isEmpty()  -> {
-            isLoding = false
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(uiState.error ?: "Something went wrong", color = Color.Red)
+                Spacer(Modifier.height(8.dp))
+                TextButton(onClick = { cartVM.load() }) { Text("Retry") }
+            }
         }
         uiState.items.isEmpty() -> {
-            isLoding = false
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(BackGroundCard)
+                        .fillMaxSize(),
+                ) {
+                    //as topbar
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.TopCenter)
+                            .padding(top = 65.dp)
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Surface(
+                            modifier = Modifier
+                                .clickable(onClick = onBack)
+                                .size(46.dp)
+                                .align(TopStart),
+                            shadowElevation = 4.dp,
+                            shape = CircleShape,
+                            color = Color.White,
+                        ) {
+                            Icon(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .size(24.dp),
+
+                                painter = painterResource(id = R.drawable.ic_back), contentDescription = "Back",
+                                tint = OldGreen
+                            )
+                        }
+                        Text(
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            text = "My Cart", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = OldGreen
+                        )
+                    }
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+
+                    ) {
+                        Text("Cart is empty", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    }
+
+
+
+
+
+
+
+
+                }
+            }
+
+
         }
         else -> {
-            isLoding = false
+
             val cartItems = uiState.items
             Box(
                 modifier = Modifier
@@ -216,7 +338,9 @@ fun ScreenCart(
                         Spacer(modifier = Modifier.height(5.dp))
                         FilledTonalButton(
                             modifier = Modifier.fillMaxWidth().height(55.dp).imePadding(),
-                            onClick = {},
+                            onClick = {
+                                showConfirm = true
+                            },
                             shape = RoundedCornerShape(32.dp),
                             colors = ButtonDefaults.filledTonalButtonColors(OldGreen, contentColor = Color.White),
 
@@ -225,6 +349,33 @@ fun ScreenCart(
                             Text("Checkout",fontWeight = FontWeight.Bold,fontSize = 20.sp)
                         }
                     }
+                    SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp))
+                }
+                if (showSuccess) {
+                    AlertDialog(
+                        onDismissRequest = {},
+                        title = { Text("Order placed") },
+                        text = { Text("Thank you! Your order is on its way.") },
+                        confirmButton = {
+                            TextButton(onClick = { showSuccess = false; onCheckoutSuccess() }) { Text("OK") }
+                        }
+                    )
+                }
+                if (showConfirm) {
+                    AlertDialog(
+                        onDismissRequest = { showConfirm = false },
+                        title = { Text("Confirm order", fontWeight = FontWeight.Bold) },
+                        text = { Text("Total: $${"%.2f".format(uiState.grandTotal)}", fontWeight = FontWeight.Bold, fontSize = 20.sp) },
+                        confirmButton = {
+                            TextButton(onClick = {
+                                showConfirm = false;
+                                cartVM.checkout()
+                            }) { Text("Place order",fontWeight = FontWeight.Bold,fontSize = 18.sp) }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showConfirm = false }) { Text("Cancel",fontWeight = FontWeight.Bold,fontSize = 18.sp) }
+                        }
+                    )
                 }
 
 
@@ -234,52 +385,13 @@ fun ScreenCart(
 
         }
     }
-    if (isLoding) {
-        Dialog(
-            onDismissRequest = {}
-        ) {
-            AnimatedVisibility(
-                visible = true,
-                enter = fadeIn(tween(300)) +
-                        scaleIn(
-                            initialScale = 0.85f,
-                            animationSpec = tween(300)
-                        )
-            ) {
-                Surface(
-                    shape = RoundedCornerShape(20.dp),
-                    color = Color.White
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Text(
-                            text = "Loading",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-
-                        CircularProgressIndicator(
-                            color = OldGreen,
-                            strokeWidth = 4.dp
-                        )
-
-                        Text(
-                            text = "Please wait...",
-                            color = Color.Gray
-                        )
-                    }
-                }
-            }
-        }
-    }
-
 
 
 }
+
+
+
+
 
 
 @Composable

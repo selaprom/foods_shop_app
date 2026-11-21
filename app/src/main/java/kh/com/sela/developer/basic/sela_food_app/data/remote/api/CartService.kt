@@ -1,10 +1,12 @@
 package kh.com.sela.developer.basic.sela_food_app.data.remote.api
 
 import kh.com.sela.developer.basic.sela_food_app.domain.model.request.AddToCartParams
+import kh.com.sela.developer.basic.sela_food_app.domain.model.request.CheckoutRequest
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.ApiResponse
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.CartItemDto
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.CartItemResponse
 import kh.com.sela.developer.basic.sela_food_app.domain.model.response.CartResponse
+import kh.com.sela.developer.basic.sela_food_app.domain.model.response.CheckoutResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -16,5 +18,10 @@ interface CartService{
 
     @GET("cart")
     suspend fun getCartItems(): Response<CartResponse>
+
+
+
+    @POST("checkout")
+    suspend fun checkout(@Body body: CheckoutRequest): Response<CheckoutResponse>
 
 }

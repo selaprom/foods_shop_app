@@ -157,6 +157,9 @@ fun AppNavigation(
                 ScreenCart(
                     onBack = {
                         backStack.removeLastOrNull()
+                    },
+                    onCheckoutSuccess = {
+                        backStack.removeLastOrNull()
                     }
                 )
             }
